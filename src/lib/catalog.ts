@@ -8,6 +8,8 @@ export type Room = {
   difficulty: "Easy" | "Medium" | "Hard";
   priceCents: number;
   currency: "eur";
+  /** Stripe product tax code; must be eligible for Managed Payments. */
+  taxCode: string;
   /** Object key of the PDF in the private file store. Never exposed to the browser. */
   pdfKey: string;
   downloadFileName: string;
@@ -27,6 +29,8 @@ export const rooms: Room[] = [
     difficulty: "Medium",
     priceCents: 1200,
     currency: "eur",
+    // Digital stand-alone document, downloadable, permanent rights.
+    taxCode: "txcd_10503000",
     pdfKey: "rooms/the-last-train/v1.pdf",
     downloadFileName: "sealed-envelope-the-last-train.pdf",
   },
