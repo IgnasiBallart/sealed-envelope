@@ -1,6 +1,8 @@
 import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "@/lib/env";
 
 export interface FileStore {
@@ -29,12 +31,41 @@ class LocalFileStore implements FileStore {
   }
 }
 
+const SIGNED_URL_TTL_SECONDS = 15 * 60;
+
+/** Private bucket from infra/app/pdfs.tf. Each download gets a fresh, short-lived signed URL. */
+class S3FileStore implements FileStore {
+  private readonly s3 = new S3Client({});
+
+  constructor(private readonly bucket: string) {}
+
+  async downloadResponse(key: string, fileName: string): Promise<Response> {
+    // The URL also stops working when the signing credentials expire, if that happens first.
+    const url = await getSignedUrl(
+      this.s3,
+      new GetObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        ResponseContentType: "application/pdf",
+        ResponseContentDisposition: `attachment; filename="${fileName}"`,
+      }),
+      { expiresIn: SIGNED_URL_TTL_SECONDS },
+    );
+    return new Response(null, {
+      status: 303,
+      headers: { Location: url, "Cache-Control": "private, no-store" },
+    });
+  }
+}
+
 let store: FileStore | undefined;
 
 function createStore(): FileStore {
   switch (env.fileStore()) {
     case "local":
       return new LocalFileStore(env.localPdfDir());
+    case "s3":
+      return new S3FileStore(env.pdfBucket());
   }
 }
 

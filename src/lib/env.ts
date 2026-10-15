@@ -27,9 +27,11 @@ export const env = {
     }
     return secret;
   },
-  orderStore: () => oneOf("ORDER_STORE", ["local"] as const, "local"),
-  fileStore: () => oneOf("FILE_STORE", ["local"] as const, "local"),
-  mailer: () => oneOf("MAILER", ["console"] as const, "console"),
+  orderStore: () => oneOf("ORDER_STORE", ["local", "dynamodb"] as const, "local"),
+  fileStore: () => oneOf("FILE_STORE", ["local", "s3"] as const, "local"),
+  mailer: () => oneOf("MAILER", ["console", "ses"] as const, "console"),
+  ordersTable: () => required("ORDERS_TABLE"),
+  pdfBucket: () => required("PDF_BUCKET"),
   localDataDir: () => process.env.LOCAL_DATA_DIR ?? ".data",
   localPdfDir: () => process.env.LOCAL_PDF_DIR ?? "storage/pdfs",
   mailFrom: () => process.env.MAIL_FROM ?? "Sealed Envelope <no-reply@localhost>",

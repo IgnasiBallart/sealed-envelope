@@ -42,6 +42,16 @@ yarn-error.log*
 /storage/
 *.pdf
 
+# terraform: providers cache, state (may hold resource details) and per-account settings.
+# .terraform.lock.hcl IS committed: it pins provider versions like package-lock.json.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+*.tfvars
+backend.hcl
+
 # vercel
 .vercel
 

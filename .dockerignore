@@ -1,0 +1,16 @@
+.git
+.github
+.next
+.data
+.idea
+.terraform
+node_modules
+storage
+infra
+*.md
+.env
+.env.*
+!.env.example
+**/*.tfstate
+**/*.tfvars
+agent-transcripts

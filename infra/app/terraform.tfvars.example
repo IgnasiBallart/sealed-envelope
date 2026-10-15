@@ -1,0 +1,14 @@
+# Copy to terraform.tfvars (git-ignored).
+sender_email       = "you@example.com"
+sandbox_recipients = ["you@example.com"]
+
+# Stripe test mode. The webhook secret is the one from the Stripe Dashboard endpoint,
+# not from `stripe listen`.
+stripe_secret_key      = "sk_test_..."
+stripe_webhook_secret  = "whsec_..."
+download_token_secret  = "replace-with-openssl-rand-hex-32-output-here"
+
+# First apply: leave these empty. After `docker push` and a second apply, set image_tag.
+# After that deploy, copy public_url here and apply a third time so emails and Stripe redirects work.
+image_tag = ""
+app_url   = ""

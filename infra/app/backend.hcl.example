@@ -1,0 +1,4 @@
+# Copy to backend.hcl with the values printed by `terraform output backend_config` in infra/bootstrap.
+bucket  = "sealed-envelope-tfstate-123456789012"
+region  = "eu-north-1"
+profile = "personal"
