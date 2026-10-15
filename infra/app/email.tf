@@ -7,6 +7,7 @@ resource "aws_sesv2_email_identity" "sender" {
 }
 
 resource "aws_sesv2_email_identity" "sandbox_recipient" {
-  for_each       = toset(var.sandbox_recipients)
+  # The sender is already an identity; SES rejects a second resource with the same address.
+  for_each       = toset([for email in var.sandbox_recipients : email if email != var.sender_email])
   email_identity = each.value
 }

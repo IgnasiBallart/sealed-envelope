@@ -36,9 +36,9 @@ resource "aws_ecs_express_gateway_service" "app" {
   # 0.5 vCPU / 1 GB is the cheap Fargate size that still runs Next.js.
   # min 1 keeps the shop up; max 2 caps the bill if traffic spikes.
   scaling_target {
-    min_task_count            = 1
-    max_task_count            = 2
-    auto_scaling_metric       = "AVERAGE_CPU"
+    min_task_count           = 1
+    max_task_count           = 2
+    auto_scaling_metric      = "AVERAGE_CPU"
     auto_scaling_target_value = 60
   }
 
