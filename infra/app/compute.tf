@@ -1,136 +1,75 @@
-# ECS Express Mode: AWS provisions the ALB, TLS, security groups and scaling.
-# App Runner closed to new accounts on 2026-04-30; this is the replacement AWS recommends.
-
-resource "aws_ecs_cluster" "app" {
-  name = "sealed-envelope"
-}
-
-resource "aws_ecs_cluster_capacity_providers" "app" {
-  cluster_name       = aws_ecs_cluster.app.name
-  capacity_providers = ["FARGATE"]
-
-  default_capacity_provider_strategy {
-    capacity_provider = "FARGATE"
-    weight            = 1
-  }
-}
+# One Lambda + a Function URL. No ALB, no API Gateway, no always-on process.
+# Idle cost is ~0 (you pay when someone hits the URL or Stripe sends a webhook).
+# The Function URL is a public HTTPS endpoint included with Lambda.
 
 resource "aws_cloudwatch_log_group" "app" {
-  name              = "/ecs/sealed-envelope"
+  name              = "/aws/lambda/sealed-envelope"
   retention_in_days = 14
 }
 
-resource "aws_ecs_express_gateway_service" "app" {
+resource "aws_lambda_function" "app" {
   count = var.image_tag == "" ? 0 : 1
 
-  service_name            = "sealed-envelope"
-  cluster                 = aws_ecs_cluster.app.name
-  cpu                     = "512"
-  memory                  = "1024"
-  health_check_path       = "/"
-  execution_role_arn      = aws_iam_role.ecs_execution.arn
-  task_role_arn           = aws_iam_role.ecs_task.arn
-  infrastructure_role_arn = aws_iam_role.ecs_infrastructure.arn
-  wait_for_steady_state   = true
+  function_name = "sealed-envelope"
+  role          = aws_iam_role.lambda.arn
+  package_type  = "Image"
+  image_uri     = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
+  architectures = ["x86_64"]
+  timeout       = 30
+  memory_size   = 1024
+  # Next.js cold start is 1–3 s; 1024 MB is enough RAM without looking like Fargate.
 
-  # 0.5 vCPU / 1 GB is the cheap Fargate size that still runs Next.js.
-  # min 1 keeps the shop up; max 2 caps the bill if traffic spikes.
-  scaling_target {
-    min_task_count           = 1
-    max_task_count           = 2
-    auto_scaling_metric      = "AVERAGE_CPU"
-    auto_scaling_target_value = 60
+  image_config {
+    command = ["node", "server.js"]
   }
 
-  primary_container {
-    image          = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
-    container_port = 3000
-
-    aws_logs_configuration {
-      log_group         = aws_cloudwatch_log_group.app.name
-      log_stream_prefix = "app"
-    }
-
-    environment {
-      name  = "NODE_ENV"
-      value = "production"
-    }
-
-    environment {
-      name  = "PORT"
-      value = "3000"
-    }
-
-    environment {
-      name  = "HOSTNAME"
-      value = "0.0.0.0"
-    }
-
-    environment {
-      name  = "AWS_REGION"
-      value = var.aws_region
-    }
-
-    environment {
-      name  = "ORDER_STORE"
-      value = "dynamodb"
-    }
-
-    environment {
-      name  = "ORDERS_TABLE"
-      value = aws_dynamodb_table.orders.name
-    }
-
-    environment {
-      name  = "FILE_STORE"
-      value = "s3"
-    }
-
-    environment {
-      name  = "PDF_BUCKET"
-      value = aws_s3_bucket.pdfs.bucket
-    }
-
-    environment {
-      name  = "MAILER"
-      value = "ses"
-    }
-
-    environment {
-      name  = "MAIL_FROM"
-      value = "Sealed Envelope <${var.sender_email}>"
-    }
-
-    dynamic "environment" {
-      for_each = var.app_url == "" ? [] : [var.app_url]
-      content {
-        name  = "APP_URL"
-        value = environment.value
-      }
-    }
-
-    secret {
-      name       = "STRIPE_SECRET_KEY"
-      value_from = aws_ssm_parameter.stripe_secret_key.arn
-    }
-
-    secret {
-      name       = "STRIPE_WEBHOOK_SECRET"
-      value_from = aws_ssm_parameter.stripe_webhook_secret.arn
-    }
-
-    secret {
-      name       = "DOWNLOAD_TOKEN_SECRET"
-      value_from = aws_ssm_parameter.download_token_secret.arn
-    }
+  environment {
+    # APP_URL is omitted until you paste public_url; otherwise env.appUrl() would see "".
+    variables = merge(
+      {
+        NODE_ENV                     = "production"
+        PORT                         = "3000"
+        HOSTNAME                     = "0.0.0.0"
+        AWS_LWA_PORT                 = "3000"
+        AWS_LWA_READINESS_CHECK_PATH = "/"
+        ORDER_STORE                  = "dynamodb"
+        ORDERS_TABLE                 = aws_dynamodb_table.orders.name
+        FILE_STORE                   = "s3"
+        PDF_BUCKET                   = aws_s3_bucket.pdfs.bucket
+        MAILER                       = "ses"
+        MAIL_FROM                    = "Sealed Envelope <${var.sender_email}>"
+        STRIPE_SECRET_KEY            = aws_ssm_parameter.stripe_secret_key.value
+        STRIPE_WEBHOOK_SECRET        = aws_ssm_parameter.stripe_webhook_secret.value
+        DOWNLOAD_TOKEN_SECRET        = aws_ssm_parameter.download_token_secret.value
+      },
+      var.app_url == "" ? {} : { APP_URL = var.app_url },
+    )
   }
 
-  # Without this, destroying the service can hang in DRAINING because the
-  # infrastructure role loses its policy before ECS can delete the ALB.
   depends_on = [
-    aws_iam_role_policy_attachment.ecs_execution,
-    aws_iam_role_policy_attachment.ecs_task_app,
-    aws_iam_role_policy_attachment.ecs_infrastructure,
-    aws_ecs_cluster_capacity_providers.app,
+    aws_iam_role_policy_attachment.lambda_app,
+    aws_iam_role_policy_attachment.lambda_logs,
+    aws_iam_role_policy_attachment.lambda_ecr,
+    aws_cloudwatch_log_group.app,
   ]
+}
+
+resource "aws_lambda_function_url" "app" {
+  count = var.image_tag == "" ? 0 : 1
+
+  function_name      = aws_lambda_function.app[0].function_name
+  authorization_type = "NONE"
+  # BUFFERED: Stripe signs the raw webhook body; streaming can break that check.
+  invoke_mode = "BUFFERED"
+}
+
+# Function URL with AuthType NONE still needs a resource policy; without it the URL returns 403.
+resource "aws_lambda_permission" "function_url" {
+  count = var.image_tag == "" ? 0 : 1
+
+  statement_id           = "FunctionURLAllowPublicAccess"
+  action                 = "lambda:InvokeFunctionUrl"
+  function_name          = aws_lambda_function.app[0].function_name
+  principal              = "*"
+  function_url_auth_type = "NONE"
 }

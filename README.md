@@ -58,12 +58,9 @@ download link appears in the dev server output.
 
 Personal AWS account, CLI profile `personal`, region `eu-north-1` (Stockholm).
 
-App Runner closed to new AWS accounts on 30 April 2026, so the app runs on **ECS Express Mode**
-(Fargate + a managed Application Load Balancer). The ALB is billed even with almost no traffic;
-destroy the Express service if you want that cost to stop.
-
-The account needs a **default VPC** in `eu-north-1` (Express Mode puts the load balancer in it).
-This account already has `vpc-05e7fb1f54e74f79d`.
+The public site runs on **AWS Lambda** (container image + Function URL). There is no load balancer
+and no always-on process: idle compute is ~€0. The first request after a quiet period can take
+1–3 seconds (cold start). DynamoDB, S3 and SES are unchanged.
 
 ```bash
 # 1. Once per account: the bucket that stores Terraform state (its own state stays local).
@@ -87,14 +84,15 @@ aws s3 cp storage/pdfs/rooms/the-last-train/v1.pdf \
   "s3://$(terraform output -raw pdf_bucket)/rooms/the-last-train/v1.pdf" --profile personal
 terraform output -raw app_env   # paste into .env.local to run Next locally against DynamoDB/S3/SES
 
-# 3. Image
-terraform output -raw docker_push   # login, build, push
+# 3. Image (includes the Lambda Web Adapter), then point Terraform at the tag
+terraform output -raw docker_push
 # set image_tag = "latest" in terraform.tfvars
+terraform plan    # creates the Lambda + Function URL; review before apply
 terraform apply
 
 # 4. Public URL → Stripe redirects and emails
 terraform output -raw public_url    # paste as app_url in terraform.tfvars (https://…)
-terraform apply
+terraform plan && terraform apply
 ```
 
 In the Stripe Dashboard (test mode) create a webhook endpoint `{public_url}/api/stripe/webhook`
@@ -117,6 +115,6 @@ apply again.
 
 - Legal notice, terms and privacy policy.
 - VAT handling for digital goods.
-- Custom domain in front of the Express Mode URL.
+- Custom domain in front of the Lambda Function URL.
 - SES production access and a domain identity with DKIM.
 - Rate limiting on `/resend`.

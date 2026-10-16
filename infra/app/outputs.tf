@@ -29,16 +29,16 @@ output "ecr_repository_url" {
 }
 
 output "docker_push" {
-  description = "Commands to build and push the image from Ubuntu"
+  description = "Build/push the Lambda image. --provenance=false --sbom=false: Lambda rejects OCI image indexes (Docker attestations)."
   value       = <<-EOT
     aws ecr get-login-password --profile ${var.aws_profile} --region ${var.aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repository.app.repository_url}
-    docker build -t sealed-envelope:latest .
+    docker build --platform linux/amd64 --provenance=false --sbom=false -t sealed-envelope:latest .
     docker tag sealed-envelope:latest ${aws_ecr_repository.app.repository_url}:latest
     docker push ${aws_ecr_repository.app.repository_url}:latest
   EOT
 }
 
 output "public_url" {
-  description = "Set this as app_url in terraform.tfvars and re-apply. Also point the Stripe webhook here: {url}/api/stripe/webhook"
-  value       = try(aws_ecs_express_gateway_service.app[0].ingress_paths[0].endpoint, null)
+  description = "Set this as app_url in terraform.tfvars and re-apply. Stripe webhook: {url}api/stripe/webhook"
+  value       = try(trimsuffix(aws_lambda_function_url.app[0].function_url, "/"), null)
 }

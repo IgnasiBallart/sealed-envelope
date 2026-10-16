@@ -37,9 +37,10 @@ yarn-error.log*
 .env*
 !.env.example
 
-# local order store and private PDFs: never commit them
+# local order store and private room files: never commit them
 /.data/
 /storage/
+/cases/
 *.pdf
 
 # terraform: providers cache, state (may hold resource details) and per-account settings.

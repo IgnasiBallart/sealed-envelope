@@ -49,7 +49,7 @@ variable "image_tag" {
 }
 
 variable "app_url" {
-  description = "Public base URL of the app (https://….ecs.eu-north-1.on.aws). Set it after the first Express Mode deploy from terraform output public_url."
+  description = "Public base URL of the Lambda Function URL (https://….lambda-url.eu-north-1.on.aws). Set it after the first deploy from terraform output public_url."
   type        = string
   default     = ""
 }
