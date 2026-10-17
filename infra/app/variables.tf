@@ -9,8 +9,14 @@ variable "aws_profile" {
 }
 
 variable "sender_email" {
-  description = "From address for purchase emails. SES emails it a verification link on apply."
+  description = "Verified Gmail used as From while the domain identity is not yet verified, and as a sandbox recipient."
   type        = string
+}
+
+variable "mail_domain" {
+  description = "Shop domain for SES Easy DKIM and later From hola@…"
+  type        = string
+  default     = "tabledetective.com"
 }
 
 variable "sandbox_recipients" {
@@ -49,7 +55,7 @@ variable "image_tag" {
 }
 
 variable "app_url" {
-  description = "Public base URL of the Lambda Function URL (https://….lambda-url.eu-north-1.on.aws). Set it after the first deploy from terraform output public_url."
+  description = "Public shop URL (https://tabledetective.com). Used in Stripe redirects and download emails. Not the raw Lambda Function URL."
   type        = string
   default     = ""
 }

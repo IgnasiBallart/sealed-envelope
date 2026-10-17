@@ -1,6 +1,7 @@
 import "server-only";
 import type Stripe from "stripe";
-import { getRoom } from "@/lib/catalog";
+import { getRoom, roomCopy } from "@/lib/catalog";
+import { isPdfLocale } from "@/lib/pdf-locale";
 import { downloadUrlFor, hashDownloadToken, downloadTokenFor, isWellFormedToken } from "@/lib/download-token";
 import { normalizeEmail } from "@/lib/email-address";
 import { getMailer } from "@/lib/mail";
@@ -23,6 +24,7 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session): 
     console.error(`Checkout session ${session.id} has unknown productSlug "${productSlug}". Skipping.`);
     return;
   }
+  const locale = isPdfLocale(session.metadata?.locale) ? session.metadata.locale : "en";
 
   const email = session.customer_details?.email ?? session.customer_email;
   if (!email) {
@@ -33,6 +35,7 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session): 
     stripeSessionId: session.id,
     email: normalizeEmail(email),
     productSlug: room.slug,
+    locale,
     paid: true,
     tokenHash: hashDownloadToken(downloadTokenFor(session.id)),
     createdAt: new Date().toISOString(),
@@ -40,7 +43,10 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session): 
 
   if (!order.emailSentAt) {
     await getMailer().send(
-      purchaseEmail(order.email, { roomName: room.name, url: downloadUrlFor(order.stripeSessionId) }),
+      purchaseEmail(order.email, locale, {
+        roomName: roomCopy(room, locale).name,
+        url: downloadUrlFor(order.stripeSessionId),
+      }),
     );
     await orderStore().markEmailSent(order.stripeSessionId, new Date().toISOString());
   }
@@ -56,9 +62,18 @@ export async function resendDownloads(email: string): Promise<void> {
   const orders = await orderStore().listPaidByEmail(email);
   const links = orders.flatMap((order) => {
     const room = getRoom(order.productSlug);
-    return room ? [{ roomName: room.name, url: downloadUrlFor(order.stripeSessionId) }] : [];
+    if (!room) return [];
+    const locale = isPdfLocale(order.locale) ? order.locale : "en";
+    return [{ roomName: roomCopy(room, locale).name, url: downloadUrlFor(order.stripeSessionId), locale }];
   });
   if (links.length > 0) {
-    await getMailer().send(resendEmail(email, links));
+    const locale = links[0]?.locale ?? "en";
+    await getMailer().send(
+      resendEmail(
+        email,
+        locale,
+        links.map(({ roomName, url }) => ({ roomName, url })),
+      ),
+    );
   }
 }

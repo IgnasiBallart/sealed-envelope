@@ -1,0 +1,17 @@
+# Shop hostname → Lambda Function URL. Deploy: npx wrangler deploy (from this directory).
+name = "tabledetective-origin"
+main = "worker.js"
+compatibility_date = "2026-10-16"
+workers_dev = false
+
+[vars]
+LAMBDA_ORIGIN = "https://zc566dswuv5mcjexjpztzl24mq0bcvys.lambda-url.eu-north-1.on.aws"
+
+# Requires DNS records for @ and www on tabledetective.com (proxied / orange cloud).
+[[routes]]
+pattern = "tabledetective.com/*"
+zone_name = "tabledetective.com"
+
+[[routes]]
+pattern = "www.tabledetective.com/*"
+zone_name = "tabledetective.com"

@@ -3,7 +3,19 @@
 import { useActionState } from "react";
 import { requestResend, type ResendState } from "./actions";
 
-export function ResendForm() {
+export function ResendForm({
+  emailLabel,
+  submitLabel,
+  sendingLabel,
+  doneLabel,
+  invalidLabel,
+}: {
+  emailLabel: string;
+  submitLabel: string;
+  sendingLabel: string;
+  doneLabel: string;
+  invalidLabel: string;
+}) {
   const [state, formAction, pending] = useActionState<ResendState, FormData>(requestResend, {
     status: "idle",
   });
@@ -11,8 +23,7 @@ export function ResendForm() {
   if (state.status === "done") {
     return (
       <p role="status" className="rounded-lg border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
-        If that address has any purchases, we&apos;ve just emailed it the download links. It can take a few minutes —
-        check your spam folder too.
+        {doneLabel}
       </p>
     );
   }
@@ -20,7 +31,7 @@ export function ResendForm() {
   return (
     <form action={formAction} className="flex flex-col gap-3 sm:max-w-md">
       <label htmlFor="email" className="font-medium">
-        Email used at checkout
+        {emailLabel}
       </label>
       <input
         id="email"
@@ -32,7 +43,7 @@ export function ResendForm() {
       />
       {state.status === "invalid" && (
         <p role="alert" className="text-sm text-red-700 dark:text-red-400">
-          That doesn&apos;t look like an email address.
+          {invalidLabel}
         </p>
       )}
       <button
@@ -40,7 +51,7 @@ export function ResendForm() {
         disabled={pending}
         className="self-start rounded-md bg-amber-700 px-6 py-3 font-semibold text-white transition hover:bg-amber-800 disabled:opacity-60"
       >
-        {pending ? "Sending…" : "Resend my downloads"}
+        {pending ? sendingLabel : submitLabel}
       </button>
     </form>
   );

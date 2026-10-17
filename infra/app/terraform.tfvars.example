@@ -1,6 +1,7 @@
 # Copy to terraform.tfvars (git-ignored).
 sender_email       = "you@example.com"
 sandbox_recipients = ["you@example.com"]
+mail_domain        = "tabledetective.com"
 
 # Stripe test mode. The webhook secret is the one from the Stripe Dashboard endpoint,
 # not from `stripe listen`.
@@ -9,6 +10,6 @@ stripe_webhook_secret  = "whsec_..."
 download_token_secret  = "replace-with-openssl-rand-hex-32-output-here"
 
 # First apply: leave these empty. After `docker push`, set image_tag to create the Lambda.
-# Then copy public_url here and apply again so emails and Stripe redirects use the Function URL.
+# Shop URL (Cloudflare). Raw Function URL is terraform output public_url.
 image_tag = ""
-app_url   = ""
+app_url   = "https://tabledetective.com"

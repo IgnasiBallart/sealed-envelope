@@ -13,8 +13,6 @@ export async function requestResend(_prev: ResendState, formData: FormData): Pro
     return { status: "invalid" };
   }
 
-  // Look up and send after responding, so the response is identical and equally fast
-  // whether or not the address has purchases.
   after(async () => {
     try {
       await resendDownloads(email);

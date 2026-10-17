@@ -77,28 +77,35 @@ terraform apply
 ```
 
 SES emails a verification link to every address in `terraform.tfvars`; click them before testing.
-Then upload the PDF, point local `.env.local` at AWS if you want, and deploy the container:
+Then upload the PDF, point local `.env.local` at AWS if you want, and deploy the container.
+`terraform output` only works from `infra/app` (or with `-chdir=infra/app` from the repo root):
 
 ```bash
-aws s3 cp storage/pdfs/rooms/the-last-train/v1.pdf \
-  "s3://$(terraform output -raw pdf_bucket)/rooms/the-last-train/v1.pdf" --profile personal
-terraform output -raw app_env   # paste into .env.local to run Next locally against DynamoDB/S3/SES
+# from the repo root
+BUCKET=$(terraform -chdir=infra/app output -raw pdf_bucket)
+aws s3 cp storage/pdfs/rooms/the-last-train/v1.es.pdf \
+  "s3://$BUCKET/rooms/the-last-train/v1.es.pdf" --profile personal
+aws s3 cp storage/pdfs/rooms/the-last-train/v1.es.solution.pdf \
+  "s3://$BUCKET/rooms/the-last-train/v1.es.solution.pdf" --profile personal
+terraform -chdir=infra/app output -raw app_env   # paste into .env.local to run Next locally against DynamoDB/S3/SES
 
-# 3. Image (includes the Lambda Web Adapter), then point Terraform at the tag
-terraform output -raw docker_push
-# set image_tag = "latest" in terraform.tfvars
-terraform plan    # creates the Lambda + Function URL; review before apply
-terraform apply
+# 3. Image (includes the Lambda Web Adapter). docker build needs the repo root (Dockerfile).
+terraform -chdir=infra/app output -raw docker_push
+# First time only: set image_tag = "latest" in terraform.tfvars, then:
+terraform -chdir=infra/app plan    # creates the Lambda + Function URL; review before apply
+terraform -chdir=infra/app apply
+# Later deploys: push :latest again, then tell Lambda to pick up the new digest
+# (Terraform will not notice a change if image_tag is still "latest"):
+# aws lambda update-function-code --function-name sealed-envelope \
+#   --image-uri "$(terraform -chdir=infra/app output -raw ecr_repository_url):latest" \
+#   --profile personal --region eu-north-1
 
-# 4. Public URL → Stripe redirects and emails
-terraform output -raw public_url    # paste as app_url in terraform.tfvars (https://…)
-terraform plan && terraform apply
+
+# 4. Shop URL is https://tabledetective.com (Cloudflare Worker in cloudflare/).
+# app_url in terraform.tfvars, then plan/apply so emails and Stripe redirects use it.
 ```
 
-In the Stripe Dashboard (test mode) create a webhook endpoint `{public_url}/api/stripe/webhook`
-for `checkout.session.completed` and `checkout.session.async_payment_succeeded`. Put that
-endpoint's `whsec_…` in `stripe_webhook_secret` (it is not the secret from `stripe listen`) and
-apply again.
+Public hostname: Cloudflare Free cannot override `Host` (that is Pro/Enterprise). `cloudflare/worker.js` fetches the Function URL so Lambda sees its own hostname. Orange-cloud CNAME `@` to the Function URL host, `www` to `@`, SSL Full (strict), then from `cloudflare/`: `npx wrangler login && npx wrangler deploy`. Stripe webhook: `https://tabledetective.com/api/stripe/webhook`.
 
 ## Scripts
 
@@ -109,7 +116,7 @@ apply again.
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Route type generation + `tsc` |
 | `npm run sample-pdf` | Writes placeholder PDFs to `LOCAL_PDF_DIR` |
-| `npm run simulate-webhook -- <email> [slug]` | Fake signed Stripe webhook |
+| `npm run simulate-webhook -- <email> [slug] [en|es|ca]` | Fake signed Stripe webhook |
 
 ## Before charging real money
 

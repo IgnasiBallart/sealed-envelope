@@ -56,6 +56,10 @@ backend.hcl
 # vercel
 .vercel
 
+# Cloudflare Wrangler local cache
+.wrangler/
+cloudflare/.wrangler/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

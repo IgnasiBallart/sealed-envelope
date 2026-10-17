@@ -1,11 +1,11 @@
 // Sends a signed, fake checkout.session.completed event to the local webhook.
-// Usage: npm run simulate-webhook -- buyer@example.com [room-slug]
+// Usage: npm run simulate-webhook -- buyer@example.com [room-slug] [en|es|ca]
 // Exercises signature check, order creation and the purchase email without a Stripe account.
 // For the real flow use the Stripe CLI (see README).
 import { randomBytes } from "node:crypto";
 import Stripe from "stripe";
 
-const [email = "buyer@example.com", productSlug = "the-last-train"] = process.argv.slice(2);
+const [email = "buyer@example.com", productSlug = "the-last-train", locale = "en"] = process.argv.slice(2);
 const appUrl = process.env.APP_URL ?? "http://localhost:3000";
 const secret = process.env.STRIPE_WEBHOOK_SECRET;
 if (!secret) {
@@ -28,7 +28,7 @@ const event = {
       status: "complete",
       customer_details: { email },
       customer_email: null,
-      metadata: { productSlug },
+      metadata: { productSlug, locale },
     },
   },
 };

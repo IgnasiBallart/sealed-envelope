@@ -37,7 +37,7 @@ resource "aws_lambda_function" "app" {
         FILE_STORE                   = "s3"
         PDF_BUCKET                   = aws_s3_bucket.pdfs.bucket
         MAILER                       = "ses"
-        MAIL_FROM                    = "Sealed Envelope <${var.sender_email}>"
+        MAIL_FROM                    = "Table Detective <${var.sender_email}>"
         STRIPE_SECRET_KEY            = aws_ssm_parameter.stripe_secret_key.value
         STRIPE_WEBHOOK_SECRET        = aws_ssm_parameter.stripe_webhook_secret.value
         DOWNLOAD_TOKEN_SECRET        = aws_ssm_parameter.download_token_secret.value

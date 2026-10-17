@@ -1,8 +1,12 @@
+import type { PdfLocale } from "@/lib/pdf-locale";
+
 export type Order = {
   /** Stripe Checkout Session id. Also the order id. */
   stripeSessionId: string;
   email: string;
   productSlug: string;
+  /** PDF language chosen at checkout. Missing on older test orders → treat as en. */
+  locale?: PdfLocale;
   paid: boolean;
   tokenHash: string;
   createdAt: string;

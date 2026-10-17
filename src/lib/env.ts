@@ -34,5 +34,5 @@ export const env = {
   pdfBucket: () => required("PDF_BUCKET"),
   localDataDir: () => process.env.LOCAL_DATA_DIR ?? ".data",
   localPdfDir: () => process.env.LOCAL_PDF_DIR ?? "storage/pdfs",
-  mailFrom: () => process.env.MAIL_FROM ?? "Sealed Envelope <no-reply@localhost>",
+  mailFrom: () => process.env.MAIL_FROM ?? "Table Detective <no-reply@localhost>",
 };

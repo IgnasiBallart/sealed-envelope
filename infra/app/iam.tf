@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "app" {
     sid     = "SendEmail"
     actions = ["ses:SendEmail"]
     resources = concat(
-      [aws_sesv2_email_identity.sender.arn],
+      [aws_sesv2_email_identity.sender.arn, aws_sesv2_email_identity.domain.arn],
       [for identity in aws_sesv2_email_identity.sandbox_recipient : identity.arn],
     )
   }
