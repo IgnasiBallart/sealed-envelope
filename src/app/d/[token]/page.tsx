@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/** Token lookup hits DynamoDB; do not prerender a static shell. */
+export const instant = false;
+
 export default function DownloadPage({ params }: PageProps<"/d/[token]">) {
   return (
     <Suspense fallback={<p className="text-ink-soft">…</p>}>

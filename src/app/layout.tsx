@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   description: "Escape rooms you print and solve at home. Buy, download the PDF, open the first envelope.",
 };
 
+/** `html lang` comes from the request header. Without this, `/_not-found` fails `next build`. */
+export const instant = false;
+
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = localeFromParam((await headers()).get("x-locale") ?? "") ?? DEFAULT_LOCALE;
   return (
