@@ -6,8 +6,15 @@ export type LegalDoc = "notice" | "privacy" | "terms";
 export type LegalSection = { heading?: string; paragraphs: string[] };
 
 function operatorBlock(locale: Locale): string[] {
-  const lines = [
-    locale === "en" ? `Operator: ${LEGAL.operatorName}.` : locale === "es" ? `Titular: ${LEGAL.operatorName}.` : `Titular: ${LEGAL.operatorName}.`,
+  const contact =
+    locale === "en"
+      ? `Contact: ${LEGAL.email}`
+      : locale === "es"
+        ? `Contacto: ${LEGAL.email}`
+        : `Contacte: ${LEGAL.email}`;
+  if (!LEGAL.publishIdentity) return [contact];
+  return [
+    locale === "en" ? `Operator: ${LEGAL.operatorName}.` : `Titular: ${LEGAL.operatorName}.`,
     LEGAL.nif
       ? `NIF: ${LEGAL.nif}.`
       : locale === "en"
@@ -16,19 +23,18 @@ function operatorBlock(locale: Locale): string[] {
           ? "El NIF constará aquí antes de cobrar en modo live."
           : "El NIF constarà aquí abans de cobrar en mode live.",
     LEGAL.addressLines.length > 0
-      ? (locale === "en" ? `Address: ${LEGAL.addressLines.join(", ")}, ${LEGAL.country}.` : locale === "es" ? `Domicilio: ${LEGAL.addressLines.join(", ")}, ${LEGAL.country}.` : `Domicili: ${LEGAL.addressLines.join(", ")}, ${LEGAL.country}.`)
+      ? locale === "en"
+        ? `Address: ${LEGAL.addressLines.join(", ")}, ${LEGAL.country}.`
+        : locale === "es"
+          ? `Domicilio: ${LEGAL.addressLines.join(", ")}, ${LEGAL.country}.`
+          : `Domicili: ${LEGAL.addressLines.join(", ")}, ${LEGAL.country}.`
       : locale === "en"
         ? `Country: ${LEGAL.country}.`
         : locale === "es"
           ? `País: ${LEGAL.country}.`
           : `País: ${LEGAL.country}.`,
-    locale === "en"
-      ? `Contact: ${LEGAL.email}`
-      : locale === "es"
-        ? `Contacto: ${LEGAL.email}`
-        : `Contacte: ${LEGAL.email}`,
+    contact,
   ];
-  return lines;
 }
 
 const copy: Record<Locale, Record<LegalDoc, { title: string; sections: LegalSection[] }>> = {

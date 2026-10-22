@@ -4,6 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LOCALES, LOCALE_SHORT, type Locale } from "@/lib/locale";
 
+export function localeChipClass(current: boolean) {
+  return current
+    ? "rounded-sm border border-rule bg-paper px-2 py-0.5 font-semibold"
+    : "px-2 py-0.5 text-ink-soft hover:text-foreground";
+}
+
 export function LanguageSwitcher({ locale, label }: { locale: Locale; label: string }) {
   const pathname = usePathname() ?? `/${locale}`;
   const rest = pathname.replace(/^\/(en|es|ca)(?=\/|$)/, "") || "/";
@@ -20,11 +26,7 @@ export function LanguageSwitcher({ locale, label }: { locale: Locale; label: str
             hrefLang={item}
             lang={item}
             aria-current={current ? "true" : undefined}
-            className={
-              current
-                ? "rounded-sm border border-rule bg-paper px-2 py-0.5 font-semibold"
-                : "px-2 py-0.5 text-ink-soft hover:text-foreground"
-            }
+            className={localeChipClass(current)}
           >
             {LOCALE_SHORT[item]}
           </Link>

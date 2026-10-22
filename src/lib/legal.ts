@@ -13,4 +13,6 @@ export const LEGAL = {
   nif: "",
   addressLines: [] as string[],
   country: "España",
+  /** Name, NIF and address on /legal. Off until Stripe live. */
+  publishIdentity: false,
 } as const;

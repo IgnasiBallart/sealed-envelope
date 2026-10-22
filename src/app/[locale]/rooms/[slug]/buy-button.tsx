@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import { localeChipClass } from "@/components/language-switcher";
+import { LOCALE_SHORT, type Locale } from "@/lib/locale";
 import { PDF_LOCALES, PDF_LOCALE_LABELS, type PdfLocale } from "@/lib/pdf-locale";
-import type { Locale } from "@/lib/locale";
 import { startCheckout, type CheckoutState } from "./actions";
 
 export function BuyButton({
@@ -22,17 +23,32 @@ export function BuyButton({
     startCheckout.bind(null, slug, uiLocale),
     {},
   );
+  const [pdfLocale, setPdfLocale] = useState<PdfLocale>(uiLocale);
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <fieldset className="flex flex-col gap-2">
         <legend className="td-kicker">{pdfLegend}</legend>
-        {PDF_LOCALES.map((locale: PdfLocale) => (
-          <label key={locale} className="flex cursor-pointer items-center gap-2 text-sm">
-            <input type="radio" name="locale" value={locale} defaultChecked={locale === uiLocale} required />
-            {PDF_LOCALE_LABELS[locale]}
-          </label>
-        ))}
+        <div className="flex items-center gap-1 text-sm">
+          {PDF_LOCALES.map((locale: PdfLocale) => {
+            const current = locale === pdfLocale;
+            return (
+              <label key={locale} className={`cursor-pointer ${localeChipClass(current)}`}>
+                <input
+                  type="radio"
+                  name="locale"
+                  value={locale}
+                  checked={current}
+                  onChange={() => setPdfLocale(locale)}
+                  required
+                  className="sr-only"
+                />
+                <span lang={locale}>{LOCALE_SHORT[locale]}</span>
+                <span className="sr-only">{PDF_LOCALE_LABELS[locale]}</span>
+              </label>
+            );
+          })}
+        </div>
       </fieldset>
       <button type="submit" disabled={pending} className="td-btn">
         {pending ? pendingLabel : label}
