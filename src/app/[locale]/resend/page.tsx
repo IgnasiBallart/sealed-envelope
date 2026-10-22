@@ -4,6 +4,8 @@ import { localeFromParam } from "@/lib/locale";
 import { t } from "@/lib/messages";
 import { ResendForm } from "./resend-form";
 
+export const instant = false;
+
 export async function generateMetadata({ params }: PageProps<"/[locale]/resend">): Promise<Metadata> {
   const locale = localeFromParam((await params).locale);
   return locale ? { title: t(locale).resend.title } : {};
@@ -15,10 +17,11 @@ export default async function ResendPage({ params }: PageProps<"/[locale]/resend
   const copy = t(locale);
 
   return (
-    <div className="flex max-w-2xl flex-col gap-6">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">{copy.resend.title}</h1>
-        <p className="text-stone-700 dark:text-stone-300">{copy.resend.lead}</p>
+    <div className="flex max-w-2xl flex-col gap-8">
+      <header className="flex flex-col gap-3">
+        <p className="td-kicker">{copy.nav.tagline}</p>
+        <h1 className="td-title text-4xl">{copy.resend.title}</h1>
+        <p className="leading-relaxed text-ink-soft">{copy.resend.lead}</p>
       </header>
       <ResendForm
         emailLabel={copy.resend.emailLabel}

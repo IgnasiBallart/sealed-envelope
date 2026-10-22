@@ -26,7 +26,7 @@ export function BuyButton({
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-stone-700 dark:text-stone-300">{pdfLegend}</legend>
+        <legend className="td-kicker">{pdfLegend}</legend>
         {PDF_LOCALES.map((locale: PdfLocale) => (
           <label key={locale} className="flex cursor-pointer items-center gap-2 text-sm">
             <input type="radio" name="locale" value={locale} defaultChecked={locale === uiLocale} required />
@@ -34,15 +34,11 @@ export function BuyButton({
           </label>
         ))}
       </fieldset>
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-md bg-amber-700 px-6 py-3 font-semibold text-white transition hover:bg-amber-800 disabled:opacity-60"
-      >
+      <button type="submit" disabled={pending} className="td-btn">
         {pending ? pendingLabel : label}
       </button>
       {state.error && (
-        <p role="alert" className="text-sm text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm text-wax">
           {state.error}
         </p>
       )}

@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { BrandMark } from "@/components/brand-mark";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { BRAND } from "@/lib/brand";
-import { LOCALES, localeFromParam, withLocale, type Locale } from "@/lib/locale";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { LOCALES, localeFromParam, withLocale } from "@/lib/locale";
 import { t } from "@/lib/messages";
+
+export const instant = false;
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
@@ -24,50 +27,35 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
 
   return (
     <>
-      <HtmlLang locale={locale} />
-      <header className="border-b border-stone-200 dark:border-stone-800">
-        <nav className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-6 py-4">
-          <Link href={withLocale(locale, "/")} className="text-lg font-semibold tracking-tight">
-            {BRAND}
-          </Link>
-          <div className="flex items-center gap-4">
+      <header className="border-b border-rule/80">
+        <nav className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4 px-6 py-5">
+          <BrandMark href={withLocale(locale, "/")} />
+          <div className="flex items-center gap-4 sm:gap-5">
             <LanguageSwitcher locale={locale} label={copy.nav.language} />
-            <Link
-              href={withLocale(locale, "/resend")}
-              className="text-sm text-stone-600 hover:underline dark:text-stone-400"
-            >
+            <ThemeToggle label={copy.nav.theme} lightLabel={copy.nav.themeLight} darkLabel={copy.nav.themeDark} />
+            <Link href={withLocale(locale, "/resend")} className="text-sm text-ink-soft hover:text-foreground">
               {copy.nav.resend}
             </Link>
           </div>
         </nav>
       </header>
-      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-12">{children}</main>
-      <footer className="border-t border-stone-200 py-6 text-sm text-stone-500 dark:border-stone-800">
+      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-14">{children}</main>
+      <footer className="border-t border-rule/80 py-7 text-sm text-ink-soft">
         <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 px-6 sm:flex-row sm:justify-between">
-          <span>{BRAND}</span>
+          <span className="td-kicker">{copy.nav.tagline}</span>
           <nav aria-label={copy.nav.legal} className="flex flex-wrap justify-center gap-4">
-            <Link href={withLocale(locale, "/legal")} className="hover:underline">
+            <Link href={withLocale(locale, "/legal")} className="hover:text-foreground">
               {copy.nav.legal}
             </Link>
-            <Link href={withLocale(locale, "/privacy")} className="hover:underline">
+            <Link href={withLocale(locale, "/privacy")} className="hover:text-foreground">
               {copy.nav.privacy}
             </Link>
-            <Link href={withLocale(locale, "/terms")} className="hover:underline">
+            <Link href={withLocale(locale, "/terms")} className="hover:text-foreground">
               {copy.nav.terms}
             </Link>
           </nav>
         </div>
       </footer>
     </>
-  );
-}
-
-function HtmlLang({ locale }: { locale: Locale }) {
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `document.documentElement.lang=${JSON.stringify(locale)};`,
-      }}
-    />
   );
 }

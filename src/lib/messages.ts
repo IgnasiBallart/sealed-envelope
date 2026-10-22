@@ -3,8 +3,18 @@ import type { Locale } from "@/lib/locale";
 
 export type Messages = {
   meta: { titleDefault: string; description: string };
-  nav: { resend: string; language: string; legal: string; privacy: string; terms: string };
-  home: { h1: string; lead: string; rooms: string };
+  nav: {
+    resend: string;
+    language: string;
+    legal: string;
+    privacy: string;
+    terms: string;
+    tagline: string;
+    theme: string;
+    themeLight: string;
+    themeDark: string;
+  };
+  home: { h1: string; lead: string; rooms: string; kicker: string; caseFile: (n: string) => string };
   room: {
     players: string;
     duration: string;
@@ -61,11 +71,17 @@ export const messages: Record<Locale, Messages> = {
       legal: "Legal notice",
       privacy: "Privacy",
       terms: "Terms",
+      tagline: "Printable dossiers",
+      theme: "Color theme",
+      themeLight: "Light",
+      themeDark: "Dark",
     },
     home: {
       h1: "Escape rooms you open at home.",
       lead: "Buy a room, download the PDF, print it and open the first envelope. No app, no account, no timer ticking on a screen.",
-      rooms: "Rooms",
+      rooms: "The case files",
+      kicker: "Tabletop mystery",
+      caseFile: (n) => `Case ${n}`,
     },
     room: {
       players: "Players",
@@ -126,11 +142,17 @@ export const messages: Record<Locale, Messages> = {
       legal: "Aviso legal",
       privacy: "Privacidad",
       terms: "Condiciones",
+      tagline: "Dossiers para imprimir",
+      theme: "Tema de color",
+      themeLight: "Claro",
+      themeDark: "Oscuro",
     },
     home: {
       h1: "Escape rooms que abres en casa.",
       lead: "Compra una sala, descarga el PDF, imprímelo y abre el primer sobre. Sin app, sin cuenta, sin temporizador en una pantalla.",
-      rooms: "Salas",
+      rooms: "Los expedientes",
+      kicker: "Misterio de mesa",
+      caseFile: (n) => `Caso ${n}`,
     },
     room: {
       players: "Jugadores",
@@ -191,11 +213,17 @@ export const messages: Record<Locale, Messages> = {
       legal: "Avís legal",
       privacy: "Privadesa",
       terms: "Condicions",
+      tagline: "Dossiers per imprimir",
+      theme: "Tema de color",
+      themeLight: "Clar",
+      themeDark: "Fosc",
     },
     home: {
       h1: "Escape rooms que obres a casa.",
       lead: "Compra una sala, descarrega el PDF, imprimeix-lo i obre el primer sobre. Sense app, sense compte, sense temporitzador a una pantalla.",
-      rooms: "Sales",
+      rooms: "Els expedients",
+      kicker: "Misteri de taula",
+      caseFile: (n) => `Cas ${n}`,
     },
     room: {
       players: "Jugadors",

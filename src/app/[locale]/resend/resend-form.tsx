@@ -22,7 +22,7 @@ export function ResendForm({
 
   if (state.status === "done") {
     return (
-      <p role="status" className="rounded-lg border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+      <p role="status" className="td-card p-5 leading-relaxed">
         {doneLabel}
       </p>
     );
@@ -39,18 +39,14 @@ export function ResendForm({
         type="email"
         required
         autoComplete="email"
-        className="rounded-md border border-stone-300 bg-white px-3 py-2 dark:border-stone-700 dark:bg-stone-900"
+        className="td-input"
       />
       {state.status === "invalid" && (
-        <p role="alert" className="text-sm text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm text-wax">
           {invalidLabel}
         </p>
       )}
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded-md bg-amber-700 px-6 py-3 font-semibold text-white transition hover:bg-amber-800 disabled:opacity-60"
-      >
+      <button type="submit" disabled={pending} className="td-btn self-start">
         {pending ? sendingLabel : submitLabel}
       </button>
     </form>

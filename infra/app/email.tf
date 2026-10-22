@@ -1,5 +1,6 @@
-# Gmail identity: SES sandbox still needs verified recipients. Keep it until production access.
-# Domain identity: DKIM for hola@tabledetective.com. Switch Lambda MAIL_FROM after DNS verifies.
+# Domain identity (DKIM) is the shop From: hola@tabledetective.com.
+# bounce.tabledetective.com may stay PENDING; USE_DEFAULT_VALUE falls back to amazonses.com.
+# Gmail identities remain for the old sandbox-era resources.
 
 resource "aws_sesv2_email_identity" "sender" {
   email_identity = var.sender_email

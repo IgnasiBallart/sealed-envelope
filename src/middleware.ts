@@ -15,8 +15,12 @@ function publicUrl(request: NextRequest): URL {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hasLocale = LOCALES.some((locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`));
-  if (hasLocale) return NextResponse.next();
+  const localeInPath = LOCALES.find((locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`));
+  if (localeInPath) {
+    const headers = new Headers(request.headers);
+    headers.set("x-locale", localeInPath);
+    return NextResponse.next({ request: { headers } });
+  }
 
   const locale = negotiateLocale(request.headers.get("accept-language"));
   const url = publicUrl(request);

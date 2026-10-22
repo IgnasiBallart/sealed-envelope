@@ -30,36 +30,38 @@ export default async function RoomPage({ params }: PageProps<"/[locale]/rooms/[s
 
   const ui = t(locale);
   const copy = roomCopy(room, locale);
+  const caseNo = String(rooms.findIndex((item) => item.slug === room.slug) + 1).padStart(2, "0");
 
   return (
-    <article className="flex flex-col gap-8">
-      <header className="flex flex-col gap-3">
-        <h1 className="text-4xl font-bold tracking-tight">{copy.name}</h1>
-        <p className="text-lg text-stone-600 dark:text-stone-400">{copy.tagline}</p>
+    <article className="flex flex-col gap-10">
+      <header className="flex max-w-2xl flex-col gap-4">
+        <p className="td-kicker">{ui.home.caseFile(caseNo)}</p>
+        <h1 className="td-title text-4xl sm:text-5xl">{copy.name}</h1>
+        <p className="text-lg leading-relaxed text-ink-soft">{copy.tagline}</p>
       </header>
 
-      <dl className="grid grid-cols-3 gap-4 rounded-lg border border-stone-200 bg-white p-4 text-sm dark:border-stone-800 dark:bg-stone-900">
-        <div>
-          <dt className="text-stone-500">{ui.room.players}</dt>
+      <dl className="td-card grid grid-cols-1 divide-y divide-rule text-sm sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="px-4 py-4">
+          <dt className="td-kicker mb-2">{ui.room.players}</dt>
           <dd className="font-medium">{copy.players}</dd>
         </div>
-        <div>
-          <dt className="text-stone-500">{ui.room.duration}</dt>
+        <div className="px-4 py-4">
+          <dt className="td-kicker mb-2">{ui.room.duration}</dt>
           <dd className="font-medium">{copy.duration}</dd>
         </div>
-        <div>
-          <dt className="text-stone-500">{ui.room.difficulty}</dt>
+        <div className="px-4 py-4">
+          <dt className="td-kicker mb-2">{ui.room.difficulty}</dt>
           <dd className="font-medium">{copy.difficulty}</dd>
         </div>
       </dl>
 
-      <div className="flex flex-col gap-4 text-stone-700 dark:text-stone-300">
+      <div className="flex max-w-2xl flex-col gap-4 leading-relaxed text-ink-soft">
         {copy.description.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
       </div>
 
-      <div className="flex flex-col gap-2 sm:max-w-xs">
+      <div className="td-card flex max-w-md flex-col gap-3 p-6">
         <BuyButton
           slug={room.slug}
           uiLocale={locale}
@@ -67,7 +69,7 @@ export default async function RoomPage({ params }: PageProps<"/[locale]/rooms/[s
           pdfLegend={ui.room.pdfLanguage}
           pendingLabel={ui.room.pending}
         />
-        <p className="text-sm text-stone-500">{ui.room.checkoutHint}</p>
+        <p className="text-sm text-ink-soft">{ui.room.checkoutHint}</p>
       </div>
     </article>
   );

@@ -20,7 +20,7 @@ output "app_env" {
     FILE_STORE=s3
     PDF_BUCKET=${aws_s3_bucket.pdfs.bucket}
     MAILER=ses
-    MAIL_FROM=Table Detective <${var.sender_email}>
+    MAIL_FROM=Table Detective <hola@${var.mail_domain}>
   EOT
 }
 

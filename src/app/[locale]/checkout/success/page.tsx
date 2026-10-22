@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { localeFromParam, withLocale } from "@/lib/locale";
 import { t } from "@/lib/messages";
 
+export const instant = false;
+
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/checkout/success">): Promise<Metadata> {
@@ -18,11 +20,12 @@ export default async function CheckoutSuccessPage({ params }: PageProps<"/[local
 
   return (
     <div className="flex max-w-2xl flex-col gap-4">
-      <h1 className="text-3xl font-bold tracking-tight">{copy.success.title}</h1>
-      <p className="text-stone-700 dark:text-stone-300">{copy.success.body}</p>
-      <p className="text-stone-700 dark:text-stone-300">
+      <p className="td-kicker">{copy.nav.tagline}</p>
+      <h1 className="td-title text-4xl">{copy.success.title}</h1>
+      <p className="leading-relaxed text-ink-soft">{copy.success.body}</p>
+      <p className="leading-relaxed text-ink-soft">
         {copy.success.spam}{" "}
-        <Link href={withLocale(locale, "/resend")} className="underline">
+        <Link href={withLocale(locale, "/resend")} className="underline decoration-rule underline-offset-4">
           {copy.success.resendLink}
         </Link>
         .

@@ -4,6 +4,8 @@ import { LegalDocView } from "@/components/legal-doc";
 import { legalDoc } from "@/lib/legal-copy";
 import { localeFromParam } from "@/lib/locale";
 
+export const instant = false;
+
 export async function generateMetadata({ params }: PageProps<"/[locale]/privacy">): Promise<Metadata> {
   const locale = localeFromParam((await params).locale);
   return locale ? { title: legalDoc(locale, "privacy").title } : {};

@@ -9,7 +9,7 @@ export function LanguageSwitcher({ locale, label }: { locale: Locale; label: str
   const rest = pathname.replace(/^\/(en|es|ca)(?=\/|$)/, "") || "/";
 
   return (
-    <nav aria-label={label} className="flex items-center gap-2 text-sm">
+    <nav aria-label={label} className="flex items-center gap-1 text-sm">
       {LOCALES.map((item) => {
         const href = rest === "/" ? `/${item}` : `/${item}${rest}`;
         const current = item === locale;
@@ -22,8 +22,8 @@ export function LanguageSwitcher({ locale, label }: { locale: Locale; label: str
             aria-current={current ? "true" : undefined}
             className={
               current
-                ? "font-semibold text-stone-900 dark:text-stone-100"
-                : "text-stone-500 hover:underline dark:text-stone-400"
+                ? "rounded-sm border border-rule bg-paper px-2 py-0.5 font-semibold"
+                : "px-2 py-0.5 text-ink-soft hover:text-foreground"
             }
           >
             {LOCALE_SHORT[item]}

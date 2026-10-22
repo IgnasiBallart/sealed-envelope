@@ -69,7 +69,7 @@ const copy: Record<Locale, Record<LegalDoc, { title: string; sections: LegalSect
           paragraphs: [
             "Email address, the room you bought, the PDF language, the Stripe Checkout session id, payment status and a hash of the download token. Stripe processes the card; we never see full card numbers.",
             "Purpose: to take payment, send the download link, resend it if you ask, and keep proof of purchase. Legal basis: performance of the contract and legal duties around invoicing.",
-            "We do not run analytics, advertising pixels or accounts. The site language is in the URL, not in a cookie. We do not set non-essential cookies. Stripe may set its own cookies on stripe.com during checkout.",
+            "We do not run analytics, advertising pixels or accounts. The site language is in the URL, not in a cookie. The color theme is stored in the browser (localStorage), not in a cookie. We do not set non-essential cookies. Stripe may set its own cookies on stripe.com during checkout.",
           ],
         },
         {
@@ -152,7 +152,7 @@ const copy: Record<Locale, Record<LegalDoc, { title: string; sections: LegalSect
           paragraphs: [
             "Correo, la sala comprada, el idioma del PDF, el id de sesión de Stripe Checkout, el estado del pago y un hash del token de descarga. Stripe procesa la tarjeta; nosotros no vemos el número completo.",
             "Finalidad: cobrar, enviar el enlace de descarga, reenviarlo si lo pides y conservar el justificante de compra. Base jurídica: ejecución del contrato y obligaciones legales de facturación.",
-            "No hay analítica, píxeles publicitarios ni cuentas. El idioma de la web va en la URL, no en una cookie. No usamos cookies no necesarias. Stripe puede poner las suyas en stripe.com durante el pago.",
+            "No hay analítica, píxeles publicitarios ni cuentas. El idioma de la web va en la URL, no en una cookie. El tema de color se guarda en el navegador (localStorage), no en una cookie. No usamos cookies no necesarias. Stripe puede poner las suyas en stripe.com durante el pago.",
           ],
         },
         {
@@ -235,7 +235,7 @@ const copy: Record<Locale, Record<LegalDoc, { title: string; sections: LegalSect
           paragraphs: [
             "Correu, la sala comprada, l’idioma del PDF, l’id de sessió de Stripe Checkout, l’estat del pagament i un hash del token de descàrrega. Stripe processa la targeta; nosaltres no veiem el número complet.",
             "Finalitat: cobrar, enviar l’enllaç de descàrrega, reenviar-lo si ho demanes i conservar el justificant de compra. Base jurídica: execució del contracte i deures legals de facturació.",
-            "No hi ha analítica, píxels publicitaris ni comptes. L’idioma de la web va a l’URL, no en una galeta. No fem servir galetes no necessàries. Stripe pot posar les seves a stripe.com durant el pagament.",
+            "No hi ha analítica, píxels publicitaris ni comptes. L’idioma de la web va a l’URL, no en una galeta. El tema de color es desa al navegador (localStorage), no en una galeta. No fem servir galetes no necessàries. Stripe pot posar les seves a stripe.com durant el pagament.",
           ],
         },
         {

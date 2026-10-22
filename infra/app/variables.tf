@@ -9,7 +9,7 @@ variable "aws_profile" {
 }
 
 variable "sender_email" {
-  description = "Verified Gmail used as From while the domain identity is not yet verified, and as a sandbox recipient."
+  description = "Sandbox-era Gmail identity. Shop From is hola@mail_domain; keep this for the SES identity resource."
   type        = string
 }
 
